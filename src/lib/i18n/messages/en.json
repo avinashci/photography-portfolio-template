@@ -1,0 +1,219 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "clear": "Clear",
+    "subscribe": "Subscribe",
+    "viewAll": "View All",
+    "readMore": "Read More",
+    "learnMore": "Learn More",
+    "featured": "Featured"
+  },
+  "navigation": {
+    "home": "Home",
+    "galleries": "Galleries",
+    "journal": "Journal",
+    "about": "About",
+    "contact": "Contact",
+    "switchLanguage": "Switch Language",
+    "skipToContent": "Skip to content"
+  },
+  "home": {
+    "title": "{name}",
+    "subtitle": "Photography",
+    "description": "Professional photographer capturing moments through visual storytelling",
+    "viewGalleries": "View Galleries",
+    "aboutMe": "About Me",
+    "latestCaptures": {
+      "title": "Featured Gallery",
+      "description": "Recent photographs showcasing the beauty of life through {name}'s lens",
+      "viewAll": "View All Captures"
+    },
+    "featuredGallery": {
+      "title": "Featured Gallery",
+      "description": "A carefully curated collection representing {name}'s artistic vision",
+      "exploreGallery": "Explore Gallery",
+      "imageCount": "{count} Images"
+    },
+    "journal": {
+      "title": "From the Journal",
+      "description": "Stories, insights, and behind-the-scenes glimpses into {name}'s photography journey",
+      "readAllPosts": "Read All Posts"
+    }
+  },
+  "galleries": {
+    "title": "Photography Galleries",
+    "description": "Explore {name}'s collection of carefully curated photography galleries, each telling a unique visual story",
+    "imageCount": "{count} images",
+    "tags": "Tags",
+    "backToGalleries": "Back to All Galleries",
+    "viewAsSlideshow": "View as Slideshow",
+    "viewGallery": "View Gallery",
+    "backToGallery": "Back to Gallery"
+  },
+  "journal": {
+    "title": "Photography Journal",
+    "description": "Stories, insights, and behind-the-scenes glimpses into {name}'s photography journey. From technical tutorials to travel adventures, discover the stories behind the images.",
+    "featuredStories": "Featured Stories",
+    "recentArticles": "Recent Articles",
+    "allArticles": "All Articles",
+    "searchPlaceholder": "Search articles...",
+    "categoryAll": "All",
+    "readTime": "{minutes} min read",
+    "publishedOn": "Published on {date}",
+    "resultsFound": "Found {count} article{count, plural, one {} other {s}}",
+    "noResults": {
+      "title": "No articles found",
+      "description": "Try adjusting your search terms or browse all categories.",
+      "clearFilters": "Clear Filters"
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Subscribe to get notified about new blog posts, photography tips, and behind-the-scenes stories from {name}'s adventures.",
+      "emailPlaceholder": "Enter your email",
+      "placeholder": "Enter your email",
+      "subscribe": "Subscribe"
+    },
+    "categories": {
+      "photography-tips": "Photography Tips",
+      "travel": "Travel",
+      "gear-reviews": "Gear Reviews",
+      "workflow": "Workflow"
+    }
+  },
+  "blogPost": {
+    "backToJournal": "Back to Journal",
+    "shareArticle": "Share this article",
+    "relatedArticles": "Related Articles",
+    "technicalDetails": "Technical Details",
+    "fileInformation": "File Information",
+    "actions": "Actions",
+    "copyLink": "Copy Link",
+    "shareImage": "Share Image",
+    "readingProgress": "Reading Progress"
+  },
+  "imageDetail": {
+    "camera": "Camera",
+    "lens": "Lens",
+    "focalLength": "Focal Length",
+    "settings": "Settings",
+    "dateCaptured": "Date Captured",
+    "location": "Location",
+    "dimensions": "Dimensions",
+    "fileSize": "File Size",
+    "colorSpace": "Color Space",
+    "software": "Software"
+  },
+  "about": {
+    "title": "About {name}",
+    "description": "Learn more about {name}'s photography journey, approach, and the stories behind the lens."
+  },
+  "footer": {
+    "copyright": "© {year} {name}. All rights reserved.",
+    "builtWith": "Built with passion for photography"
+  },
+  "theme": {
+    "toggleTheme": "Toggle theme",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "search": {
+    "title": "Search",
+    "description": "Search through {name}'s photography portfolio for galleries, images, and journal entries",
+    "placeholder": "Search galleries, images, journal entries...",
+    "searchButton": "Search",
+    "clearButton": "Clear",
+    "noResults": "No results found",
+    "noResultsDescription": "Couldn't find anything matching \"{query}\". Try different search terms or browse our content.",
+    "searching": "Searching...",
+    "viewAllResults": "View all {count} results",
+    "advancedSearch": "Advanced Search",
+    "quickSearchTip": "Press Cmd+K to open",
+    "welcomeTitle": "Search {name}'s Portfolio",
+    "welcomeDescription": "Find anything across galleries, images, and travel journal entries.",
+    "minCharacters": "Start typing to search (minimum 2 characters)",
+    "shortPlaceholder": "Search...",
+    "filters": {
+      "all": "All",
+      "galleries": "Galleries",
+      "images": "Images",
+      "blog": "Journal"
+    },
+    "resultTypes": {
+      "gallery": "Gallery",
+      "image": "Image",
+      "blog": "Journal"
+    },
+    "resultCounts": {
+      "found": "Found {count} results",
+      "foundFor": "Found {count} results for \"{query}\"",
+      "images": "images"
+    }
+  },
+  "lightbox": {
+    "previous": "Previous image",
+    "next": "Next image",
+    "close": "Close lightbox"
+  },
+  "admin": {
+    "tags": {
+      "placeholder": "Add tags (separate with commas)..."
+    },
+    "keywords": {
+      "placeholder": "Add keywords (separate with commas)..."
+    }
+  },
+  "meta": {
+    "defaultTitle": "{name} - Photography Portfolio",
+    "defaultDescription": "Professional photography portfolio showcasing stunning visual stories and moments captured through the lens.",
+    "galleryTitle": "{galleryName} - Photography Gallery",
+    "blogPostTitle": "{title} - Photography Journal"
+  },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "imageRights": "Image Rights",
+    "lastUpdated": "Last updated"
+  },
+  "comments": {
+    "title": "Comments",
+    "shareComments": "Share Comments",
+    "hideComments": "Hide Comments",
+    "noComments": "No comments yet",
+    "beFirst": "Be the first to share your thoughts!",
+    "loadMore": "Load More Comments",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "form": {
+      "title": "Share Your Thoughts",
+      "subtitle": "Your comment will be reviewed before being published",
+      "name": "Name",
+      "email": "Email",
+      "emailNote": "(not published)",
+      "website": "Website (optional)",
+      "comment": "Comment",
+      "placeholder": "Share your thoughts about this image...",
+      "submit": "Submit Comment",
+      "submitting": "Submitting...",
+      "preview": "Preview",
+      "edit": "Edit comment",
+      "privacy": "By submitting this comment, you agree that your name and comment will be published on this website. Your email address will not be published or shared. All comments are moderated and may not appear immediately.",
+      "success": {
+        "title": "Comment submitted successfully!",
+        "message": "Thanks for your feedback. Your comment will be reviewed and published soon."
+      },
+      "error": "Error"
+    },
+    "moderation": "Comments are moderated and may not appear immediately after submission.",
+    "moderationNotice": "Comments are moderated and may not appear immediately. Please keep discussions respectful and on-topic."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "sitemap": "http://localhost:3000/sitemap.xml",
+  "defaults": {
+    "timeout": 20000,
+    "wait": 3000,
+    "chromeLaunchConfig": {
+      "ignoreHTTPSErrors": true,
+      "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+    },
+    "standard": "WCAG2AA",
+    "level": "error",
+    "reporters": [
+      "cli",
+      ["json", { "fileName": "reports/pa11y/results.json" }]
+    ],
+    "ignore": [
+      "WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.Fail",
+      "notice"
+    ]
+  },
+  "urls": [
+    "http://localhost:3000/en",
+    "http://localhost:3000/en/about",
+    "http://localhost:3000/en/galleries",
+    "http://localhost:3000/en/journal",
+    "http://localhost:3000/ta"
+  ]
+}

@@ -1,0 +1,431 @@
+import type { Metadata } from 'next'
+import { SITE_CONFIG, DERIVED_CONFIG } from '@/config/site.config'
+
+/**
+ * Comprehensive SEO utilities for the photography portfolio
+ * 
+ * These utilities generate SEO metadata from CMS content with intelligent
+ * fallbacks and photography-specific enhancements.
+ */
+
+// Type definitions for SEO data structures
+export interface SEOData {
+  title?: string
+  description?: string
+  keywords?: string[]
+  canonicalUrl?: string
+  noIndex?: boolean
+  noFollow?: boolean
+  ogImage?: string | { url: string; alt: string; width?: number; height?: number }
+  ogTitle?: string
+  ogDescription?: string
+  twitterCard?: 'summary' | 'summary_large_image'
+  structuredDataType?: string
+  author?: string
+  publishedTime?: string
+  modifiedTime?: string
+  section?: string
+  tags?: string[]
+}
+
+export interface ImageSEOData {
+  url: string
+  alt: string
+  title?: string
+  width?: number
+  height?: number
+  caption?: string
+  photographer?: string
+  location?: string
+  keywords?: string[]
+  geoLocation?: {
+    latitude: number
+    longitude: number
+    locationName: string
+  }
+}
+
+export interface GallerySEOData extends SEOData {
+  imageCount?: number
+  coverImage?: string
+  galleryType?: string
+  location?: string
+  dateRange?: string
+}
+
+export interface BlogPostSEOData extends SEOData {
+  readingTime?: string
+  category?: string
+  featuredImage?: string
+  gallery?: string
+  tripDates?: string
+}
+
+/**
+ * Generate comprehensive metadata for any page type
+ */
+export function generateSEOMetadata(
+  pageType: 'home' | 'about' | 'gallery' | 'galleries' | 'image' | 'blog' | 'blogs' | 'static',
+  data: SEOData,
+  locale: string = 'en'
+): Metadata {
+  // Build title with consistent pattern
+  const title = data.title 
+    ? DERIVED_CONFIG.getPageTitle(data.title)
+    : DERIVED_CONFIG.getPageTitle(getDefaultTitle(pageType))
+
+  // Build description with fallbacks
+  const description = data.description || getDefaultDescription(pageType, data)
+
+  // Build keywords with intelligent combination
+  const keywords = buildKeywords(pageType, data.keywords, data.tags)
+
+  // Build canonical URL
+  const canonical = data.canonicalUrl || buildCanonicalUrl(pageType, locale, data)
+
+  // Build Open Graph data
+  const openGraph = buildOpenGraphData(pageType, data, title, description)
+
+  // Build Twitter Card data
+  const twitter = buildTwitterCardData(data, title, description)
+
+  // Build robots directives
+  const robots = buildRobotsDirective(data.noIndex, data.noFollow)
+
+  return {
+    title,
+    description,
+    keywords,
+    authors: data.author ? [{ name: data.author }] : [{ name: SITE_CONFIG.personal.name }],
+    category: SITE_CONFIG.site.type.charAt(0).toUpperCase() + SITE_CONFIG.site.type.slice(1),
+    publisher: SITE_CONFIG.site.name,
+    openGraph,
+    twitter,
+    alternates: {
+      canonical,
+      languages: buildLanguageAlternates(pageType, data, locale),
+    },
+    robots,
+    other: buildOtherMetaTags(pageType, data),
+  }
+}
+
+/**
+ * Generate image-specific SEO metadata
+ */
+export function generateImageSEOMetadata(
+  imageData: ImageSEOData,
+  galleryTitle: string,
+  locale: string = 'en'
+): Metadata {
+  const title = DERIVED_CONFIG.getPageTitle(imageData.alt || 'Photography')
+  
+  const description = buildImageDescription(imageData, galleryTitle)
+  
+  const keywords = [
+    ...SITE_CONFIG.site.keywords.split(', '),
+    ...(imageData.keywords || []),
+    galleryTitle.toLowerCase(),
+    imageData.location || '',
+  ].filter(Boolean).join(', ')
+
+  return generateSEOMetadata('image', {
+    title: imageData.alt,
+    description,
+    keywords: keywords.split(', '),
+    ogImage: {
+      url: imageData.url,
+      alt: imageData.alt,
+      width: imageData.width || 1200,
+      height: imageData.height || 800,
+    },
+    author: imageData.photographer || SITE_CONFIG.personal.name,
+    section: galleryTitle,
+    ...(imageData.geoLocation && {
+      // Add geo meta tags in 'other' section
+    }),
+  }, locale)
+}
+
+/**
+ * Generate gallery-specific SEO metadata
+ */
+export function generateGallerySEOMetadata(
+  galleryData: GallerySEOData,
+  locale: string = 'en'
+): Metadata {
+  const description = galleryData.description || 
+    `A photography gallery featuring ${galleryData.imageCount || 'stunning'} images${galleryData.location ? ` from ${galleryData.location}` : ''}.`
+
+  return generateSEOMetadata('gallery', {
+    ...galleryData,
+    description,
+    ogImage: galleryData.coverImage,
+  }, locale)
+}
+
+/**
+ * Generate blog post SEO metadata
+ */
+export function generateBlogPostSEOMetadata(
+  blogData: BlogPostSEOData,
+  locale: string = 'en'
+): Metadata {
+  return generateSEOMetadata('blog', {
+    ...blogData,
+    structuredDataType: 'Article',
+  }, locale)
+}
+
+/**
+ * Generate JSON-LD structured data
+ */
+export function generateStructuredData(
+  type: string,
+  data: any,
+  pageUrl: string
+): Record<string, any> {
+  const baseData = {
+    '@context': 'https://schema.org',
+    '@type': type,
+    url: pageUrl,
+  }
+
+  switch (type) {
+    case 'Person':
+      return {
+        ...baseData,
+        name: data.name || SITE_CONFIG.personal.name,
+        jobTitle: data.jobTitle || SITE_CONFIG.personal.title,
+        description: data.description,
+        url: SITE_CONFIG.url.base,
+        sameAs: DERIVED_CONFIG.enabledSocialLinks.map(link => link.url),
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: SITE_CONFIG.personal.location,
+        },
+        knowsAbout: data.skills || [],
+      }
+
+    case 'ImageObject':
+      return {
+        ...baseData,
+        name: data.title,
+        description: data.description,
+        contentUrl: data.imageUrl,
+        thumbnailUrl: data.thumbnailUrl,
+        author: {
+          '@type': 'Person',
+          name: data.photographer || SITE_CONFIG.personal.name,
+        },
+        copyrightHolder: {
+          '@type': 'Person',
+          name: SITE_CONFIG.personal.name,
+        },
+        creditText: data.photographer || SITE_CONFIG.personal.name,
+        ...(data.location && {
+          contentLocation: {
+            '@type': 'Place',
+            name: data.location,
+          },
+        }),
+        ...(data.dateCreated && {
+          dateCreated: data.dateCreated,
+        }),
+      }
+
+    case 'Article':
+      return {
+        ...baseData,
+        headline: data.title,
+        description: data.description,
+        author: {
+          '@type': 'Person',
+          name: data.author || SITE_CONFIG.personal.name,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: SITE_CONFIG.site.name,
+        },
+        datePublished: data.publishedTime,
+        dateModified: data.modifiedTime,
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': pageUrl,
+        },
+        image: data.featuredImage,
+        articleSection: data.category,
+        keywords: data.keywords?.join(', '),
+      }
+
+    case 'Organization':
+      return {
+        ...baseData,
+        name: SITE_CONFIG.site.name,
+        description: SITE_CONFIG.site.description,
+        url: SITE_CONFIG.url.base,
+        logo: `${SITE_CONFIG.url.base}/logo.png`,
+        sameAs: DERIVED_CONFIG.enabledSocialLinks.map(link => link.url),
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          email: SITE_CONFIG.personal.email,
+        },
+      }
+
+    default:
+      return baseData
+  }
+}
+
+// Helper functions
+
+function getDefaultTitle(pageType: string): string {
+  const titles = {
+    home: SITE_CONFIG.site.title,
+    about: `About ${SITE_CONFIG.personal.name}`,
+    galleries: 'Photography Galleries',
+    gallery: 'Photography Gallery',
+    blogs: 'Photography Journal',
+    blog: 'Blog Post',
+    image: 'Photography',
+    static: 'Page',
+  }
+  return titles[pageType as keyof typeof titles] || 'Page'
+}
+
+function getDefaultDescription(pageType: string, data: SEOData): string {
+  const descriptions = {
+    home: SITE_CONFIG.site.description,
+    about: `Learn more about ${SITE_CONFIG.personal.name}, ${SITE_CONFIG.personal.title.toLowerCase()}.`,
+    galleries: `Explore photography galleries by ${SITE_CONFIG.personal.name}.`,
+    gallery: `A photography gallery by ${SITE_CONFIG.personal.name}.`,
+    blogs: `Photography stories and insights by ${SITE_CONFIG.personal.name}.`,
+    blog: `A blog post by ${SITE_CONFIG.personal.name}.`,
+    image: `A photograph by ${SITE_CONFIG.personal.name}.`,
+    static: `Information page.`,
+  }
+  return descriptions[pageType as keyof typeof descriptions] || SITE_CONFIG.site.description
+}
+
+function buildKeywords(pageType: string, customKeywords?: string[], tags?: string[]): string {
+  const baseKeywords = SITE_CONFIG.site.keywords.split(', ')
+  const pageKeywords = customKeywords || []
+  const tagKeywords = tags || []
+  
+  const typeKeywords: Record<string, string[]> = {
+    home: [],
+    about: ['photographer profile', 'about photographer'],
+    galleries: ['photo galleries', 'photography collections'],
+    gallery: ['photo gallery', 'photography collection'],
+    blogs: ['photography blog', 'photo stories'],
+    blog: ['photography article', 'photo story'],
+    image: ['photograph', 'photography'],
+    static: [],
+  }
+
+  return [...baseKeywords, ...pageKeywords, ...tagKeywords, ...(typeKeywords[pageType] || [])]
+    .filter(Boolean)
+    .slice(0, 10) // Limit to 10 keywords
+    .join(', ')
+}
+
+function buildCanonicalUrl(pageType: string, locale: string, data: SEOData): string {
+  // Build canonical URLs based on page type and data
+  const base = `${SITE_CONFIG.url.base}/${locale}`
+  
+  // This would need specific logic based on your routing
+  return base
+}
+
+function buildOpenGraphData(pageType: string, data: SEOData, title: string, description: string) {
+  return {
+    title: data.ogTitle || title,
+    description: data.ogDescription || description,
+    type: pageType === 'blog' ? 'article' : 'website',
+    siteName: SITE_CONFIG.site.name,
+    images: data.ogImage ? (
+      typeof data.ogImage === 'string' ? [data.ogImage] : [{
+        url: data.ogImage.url,
+        alt: data.ogImage.alt,
+        width: data.ogImage.width || 1200,
+        height: data.ogImage.height || 630,
+      }]
+    ) : [],
+    ...(data.publishedTime && { publishedTime: data.publishedTime }),
+    ...(data.modifiedTime && { modifiedTime: data.modifiedTime }),
+    ...(data.author && { authors: [data.author] }),
+    ...(data.section && { section: data.section }),
+    ...(data.tags && { tags: data.tags }),
+  }
+}
+
+function buildTwitterCardData(data: SEOData, title: string, description: string) {
+  return {
+    card: data.twitterCard || 'summary_large_image',
+    title: data.ogTitle || title,
+    description: data.ogDescription || description,
+    creator: SITE_CONFIG.social.twitter ? `@${SITE_CONFIG.social.twitter.split('/').pop()}` : undefined,
+    images: data.ogImage ? (
+      typeof data.ogImage === 'string' ? [data.ogImage] : [data.ogImage.url]
+    ) : [],
+  }
+}
+
+function buildRobotsDirective(noIndex?: boolean, noFollow?: boolean) {
+  const directives: string[] = []
+  
+  if (noIndex) directives.push('noindex')
+  else directives.push('index')
+  
+  if (noFollow) directives.push('nofollow')
+  else directives.push('follow')
+  
+  return {
+    index: !noIndex,
+    follow: !noFollow,
+    googleBot: {
+      index: !noIndex,
+      follow: !noFollow,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  }
+}
+
+function buildLanguageAlternates(pageType: string, data: SEOData, currentLocale: string) {
+  return {
+    'en': `${SITE_CONFIG.url.base}/en`,
+    'ta': `${SITE_CONFIG.url.base}/ta`,
+  }
+}
+
+function buildOtherMetaTags(pageType: string, data: SEOData): Record<string, string> {
+  const tags: Record<string, string> = {}
+  
+  if (data.author) {
+    tags['article:author'] = data.author
+  }
+  
+  if (data.section) {
+    tags['article:section'] = data.section
+  }
+  
+  if (data.publishedTime) {
+    tags['article:published_time'] = data.publishedTime
+  }
+  
+  return tags
+}
+
+function buildImageDescription(imageData: ImageSEOData, galleryTitle: string): string {
+  const parts = [
+    imageData.alt,
+    imageData.location ? `captured in ${imageData.location}` : null,
+    `from the ${galleryTitle} photography collection`,
+    `by ${imageData.photographer || SITE_CONFIG.personal.name}`,
+  ].filter(Boolean)
+  
+  return parts.join(' ')
+}

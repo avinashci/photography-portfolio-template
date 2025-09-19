@@ -1,0 +1,147 @@
+/**
+ * Structured Data Component for SEO
+ * 
+ * This component generates JSON-LD structured data for different page types
+ * to help search engines better understand your photography portfolio content.
+ */
+
+import { generateStructuredData } from '@/lib/utils/seo-utils'
+
+interface StructuredDataProps {
+  type: 'Person' | 'ImageObject' | 'Article' | 'Organization' | 'WebPage' | 'CreativeWork'
+  data: any
+  pageUrl: string
+}
+
+export default function StructuredData({ type, data, pageUrl }: StructuredDataProps) {
+  const structuredData = generateStructuredData(type, data, pageUrl)
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData, null, 2),
+      }}
+    />
+  )
+}
+
+// Specific structured data components for different content types
+
+interface ImageStructuredDataProps {
+  image: {
+    title: string
+    description?: string
+    imageUrl: string
+    thumbnailUrl?: string
+    photographer?: string
+    location?: string
+    dateCreated?: string
+    width?: number
+    height?: number
+    keywords?: string[]
+  }
+  pageUrl: string
+}
+
+export function ImageStructuredData({ image, pageUrl }: ImageStructuredDataProps) {
+  return (
+    <StructuredData
+      type="ImageObject"
+      data={image}
+      pageUrl={pageUrl}
+    />
+  )
+}
+
+interface ArticleStructuredDataProps {
+  article: {
+    title: string
+    description: string
+    author?: string
+    publishedTime?: string
+    modifiedTime?: string
+    featuredImage?: string
+    category?: string
+    keywords?: string[]
+    readingTime?: string
+  }
+  pageUrl: string
+}
+
+export function ArticleStructuredData({ article, pageUrl }: ArticleStructuredDataProps) {
+  return (
+    <StructuredData
+      type="Article"
+      data={article}
+      pageUrl={pageUrl}
+    />
+  )
+}
+
+interface PersonStructuredDataProps {
+  person: {
+    name: string
+    jobTitle: string
+    description?: string
+    skills?: string[]
+    location?: string
+    profileImage?: string
+  }
+  pageUrl: string
+}
+
+export function PersonStructuredData({ person, pageUrl }: PersonStructuredDataProps) {
+  return (
+    <StructuredData
+      type="Person"
+      data={person}
+      pageUrl={pageUrl}
+    />
+  )
+}
+
+interface OrganizationStructuredDataProps {
+  pageUrl: string
+}
+
+export function OrganizationStructuredData({ pageUrl }: OrganizationStructuredDataProps) {
+  return (
+    <StructuredData
+      type="Organization"
+      data={{}} // Uses site config defaults
+      pageUrl={pageUrl}
+    />
+  )
+}
+
+// Gallery-specific structured data (as Creative Work)
+interface GalleryStructuredDataProps {
+  gallery: {
+    title: string
+    description: string
+    dateCreated?: string
+    imageCount?: number
+    coverImage?: string
+    location?: string
+    tags?: string[]
+  }
+  pageUrl: string
+}
+
+export function GalleryStructuredData({ gallery, pageUrl }: GalleryStructuredDataProps) {
+  return (
+    <StructuredData
+      type="CreativeWork"
+      data={{
+        ...gallery,
+        '@type': 'ImageGallery',
+        creator: {
+          '@type': 'Person',
+          name: process.env.NEXT_PUBLIC_PHOTOGRAPHER_NAME,
+        },
+      }}
+      pageUrl={pageUrl}
+    />
+  )
+}

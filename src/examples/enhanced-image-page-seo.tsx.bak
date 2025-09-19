@@ -1,0 +1,293 @@
+/**
+ * EXAMPLE: Enhanced Image Detail Page with Comprehensive SEO
+ * 
+ * This example shows how to integrate the new SEO utilities and structured data
+ * into your existing image detail pages for maximum search engine optimization.
+ * 
+ * Copy the relevant parts to your actual image detail page component.
+ */
+
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
+import { getImageBySlug, getGalleryBySlug, getLocalizedValue, formatDate } from '@/lib/api/api-client'
+import type { PayloadImage, PayloadGallery } from '@/lib/api/api-client'
+import type { Metadata } from 'next'
+
+// Import the new SEO utilities
+import { generateImageSEOMetadata, type ImageSEOData } from '@/lib/utils/seo-utils'
+import { ImageStructuredData } from '@/components/seo/StructuredData'
+
+interface ImageDetailPageProps {
+  params: Promise<{ locale: string; slug: string; imageSlug: string }>
+}
+
+// Enhanced metadata generation using the new SEO utilities
+export async function generateMetadata({ params }: ImageDetailPageProps): Promise<Metadata> {
+  const { locale, slug, imageSlug } = await params
+  
+  const image = await getImageBySlug(imageSlug)
+  const gallery = await getGalleryBySlug(slug)
+  
+  if (!image || !gallery) {
+    return {
+      title: 'Image Not Found',
+      description: 'The requested image could not be found.'
+    }
+  }
+
+  const imageTitle = getLocalizedValue(image.title, locale as 'en' | 'ta')
+  const imageDescription = getLocalizedValue(image.description, locale as 'en' | 'ta')
+  const galleryTitle = getLocalizedValue((gallery as PayloadGallery).title, locale as 'en' | 'ta')
+  const locationName = image.location ? getLocalizedValue(image.location.name, locale as 'en' | 'ta') : null
+  const imageTags = image.tags ? getLocalizedValue(image.tags, locale as 'en' | 'ta') : []
+  const imageUrl = ('imageUrls' in image ? image.imageUrls?.full : null) || ''
+
+  // Build enhanced image SEO data
+  const imageSEOData: ImageSEOData = {
+    url: imageUrl,
+    alt: imageTitle,
+    title: imageTitle,
+    width: image.technical?.width,
+    height: image.technical?.height,
+    caption: imageDescription,
+    photographer: image.rights?.photographer || undefined,
+    location: locationName || undefined,
+    keywords: imageTags,
+    ...(image.location?.coordinates && {
+      geoLocation: {
+        latitude: image.location.coordinates.lat,
+        longitude: image.location.coordinates.lng,
+        locationName: locationName || 'Unknown Location',
+      }
+    })
+  }
+
+  // Generate comprehensive SEO metadata
+  return generateImageSEOMetadata(imageSEOData, galleryTitle, locale)
+}
+
+export default async function EnhancedImageDetailPage({ params }: ImageDetailPageProps) {
+  const { locale, slug, imageSlug } = await params
+  
+  const image = await getImageBySlug(imageSlug)
+  const gallery = await getGalleryBySlug(slug)
+  
+  if (!image || !gallery) {
+    notFound()
+  }
+
+  const imageTitle = getLocalizedValue(image.title, locale as 'en' | 'ta')
+  const imageDescription = getLocalizedValue(image.description, locale as 'en' | 'ta')
+  const galleryTitle = getLocalizedValue((gallery as PayloadGallery).title, locale as 'en' | 'ta')
+  const locationName = image.location ? getLocalizedValue(image.location.name, locale as 'en' | 'ta') : null
+  const imageUrl = ('imageUrls' in image ? image.imageUrls?.full : null) || ''
+
+  // Build current page URL for structured data
+  const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/galleries/${slug}/images/${imageSlug}`
+
+  return (
+    <>
+      {/* Enhanced JSON-LD Structured Data */}
+      <ImageStructuredData
+        image={{
+          title: imageTitle,
+          description: imageDescription,
+          imageUrl: imageUrl,
+          thumbnailUrl: ('imageUrls' in image ? image.imageUrls?.medium : null) || imageUrl,
+          photographer: image.rights?.photographer,
+          location: locationName,
+          dateCreated: image.captureDate,
+          width: image.technical?.width,
+          height: image.technical?.height,
+          keywords: image.tags ? getLocalizedValue(image.tags, locale as 'en' | 'ta') : [],
+        }}
+        pageUrl={currentUrl}
+      />
+
+      <div className="min-h-screen pt-24 bg-background">
+        <div className="container mx-auto px-4 py-20">
+          {/* Breadcrumb with SEO-friendly structure */}
+          <nav className="mb-8" aria-label="Breadcrumb">
+            <ol 
+              className="flex items-center space-x-2 text-sm text-muted-foreground"
+              itemScope 
+              itemType="https://schema.org/BreadcrumbList"
+            >
+              <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+                <Link 
+                  href={`/${locale}/galleries`} 
+                  className="hover:text-foreground transition-colors"
+                  itemProp="item"
+                >
+                  <span itemProp="name">Galleries</span>
+                </Link>
+                <meta itemProp="position" content="1" />
+              </li>
+              <li>/</li>
+              <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+                <Link 
+                  href={`/${locale}/galleries/${slug}`} 
+                  className="hover:text-foreground transition-colors"
+                  itemProp="item"
+                >
+                  <span itemProp="name">{galleryTitle}</span>
+                </Link>
+                <meta itemProp="position" content="2" />
+              </li>
+              <li>/</li>
+              <li 
+                className="text-foreground font-medium"
+                itemProp="itemListElement" 
+                itemScope 
+                itemType="https://schema.org/ListItem"
+              >
+                <span itemProp="name">{imageTitle}</span>
+                <meta itemProp="position" content="3" />
+              </li>
+            </ol>
+          </nav>
+
+          <div className="grid lg:grid-cols-3 gap-12">
+            {/* Main Image with enhanced SEO attributes */}
+            <div className="lg:col-span-2">
+              <figure 
+                className="mb-8"
+                itemScope 
+                itemType="https://schema.org/ImageObject"
+              >
+                <div className="bg-muted rounded-lg overflow-hidden shadow-lg border border-border">
+                  <img
+                    src={imageUrl}
+                    alt={imageTitle}
+                    title={imageTitle}
+                    className="w-full h-auto object-contain"
+                    itemProp="contentUrl"
+                    width={image.technical?.width}
+                    height={image.technical?.height}
+                    loading="eager" // Above the fold image
+                  />
+                  
+                  {/* Hidden structured data elements */}
+                  <meta itemProp="name" content={imageTitle} />
+                  {imageDescription && <meta itemProp="description" content={imageDescription} />}
+                  <meta itemProp="author" content={image.rights?.photographer || process.env.NEXT_PUBLIC_PHOTOGRAPHER_NAME} />
+                  <meta itemProp="copyrightHolder" content={process.env.NEXT_PUBLIC_PHOTOGRAPHER_NAME} />
+                  {locationName && <meta itemProp="contentLocation" content={locationName} />}
+                  {image.captureDate && <meta itemProp="dateCreated" content={image.captureDate} />}
+                </div>
+                
+                {/* Enhanced caption with structured data */}
+                {imageDescription && (
+                  <figcaption 
+                    className="mt-4 text-sm text-muted-foreground text-center"
+                    itemProp="caption"
+                  >
+                    {imageDescription}
+                  </figcaption>
+                )}
+
+                {/* Capture Info and Copyright */}
+                <div className="flex justify-between items-start mt-4 text-sm text-muted-foreground">
+                  <div>
+                    <time dateTime={image.captureDate} itemProp="dateCreated">
+                      {formatDate(image.captureDate, locale as 'en' | 'ta')}
+                    </time>
+                    {locationName && (
+                      <div itemProp="contentLocation" itemScope itemType="https://schema.org/Place">
+                        <span itemProp="name">{locationName}</span>
+                        {/* Hidden geo coordinates for SEO */}
+                        {image.location?.coordinates && (
+                          <>
+                            <meta itemProp="latitude" content={image.location.coordinates.lat.toString()} />
+                            <meta itemProp="longitude" content={image.location.coordinates.lng.toString()} />
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    {image.rights?.copyright && (
+                      <div itemProp="copyrightNotice">© {image.rights.copyright}</div>
+                    )}
+                  </div>
+                </div>
+              </figure>
+
+              {/* Rest of your existing component... */}
+            </div>
+
+            {/* Enhanced sidebar with structured data */}
+            <div className="space-y-8">
+              <section>
+                <h1 
+                  className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-4"
+                  itemProp="name"
+                >
+                  {imageTitle}
+                </h1>
+                <p 
+                  className="text-base text-muted-foreground leading-relaxed"
+                  itemProp="description"
+                >
+                  {imageDescription}
+                </p>
+              </section>
+
+              {/* Technical Details with structured data */}
+              {image.technical && (
+                <section itemScope itemType="https://schema.org/ExifData">
+                  <h2 className="font-serif text-xl font-semibold mb-4 text-foreground">
+                    Technical Details
+                  </h2>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    {image.technical.cameraBody && (
+                      <div itemProp="model">
+                        Camera: {getLocalizedValue(image.technical.cameraBody.name, locale as 'en' | 'ta')}
+                      </div>
+                    )}
+                    {image.technical.lensGear && (
+                      <div itemProp="lens">
+                        Lens: {getLocalizedValue(image.technical.lensGear.name, locale as 'en' | 'ta')}
+                      </div>
+                    )}
+                    {image.technical.aperture && (
+                      <div itemProp="fNumber">Aperture: {image.technical.aperture}</div>
+                    )}
+                    {image.technical.shutterSpeed && (
+                      <div itemProp="exposureTime">Shutter: {image.technical.shutterSpeed}</div>
+                    )}
+                    {image.technical.iso && (
+                      <div itemProp="isoSpeedRating">ISO: {image.technical.iso}</div>
+                    )}
+                    {image.technical.focalLength && (
+                      <div itemProp="focalLength">{image.technical.focalLength}mm</div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* SEO-Enhanced Tags */}
+              {image.tags && (
+                <section>
+                  <h2 className="font-serif text-xl font-semibold mb-4 text-foreground">Tags</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {getLocalizedValue(image.tags, locale as 'en' | 'ta').map((tag, index) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-medium"
+                        itemProp="keywords"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
