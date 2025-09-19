@@ -135,6 +135,7 @@ export async function generateMetadata({ params }: ImageDetailPageProps): Promis
 export default async function ImageDetailPage({ params }: ImageDetailPageProps) {
   const { locale, slug, imageSlug } = await params
   const t = await getTranslations('galleries')
+  const tNav = await getTranslations('nav')
   
   // Fetch image, gallery and default copyright from CMS
   const [image, defaultCopyright] = await Promise.all([
@@ -219,7 +220,7 @@ export default async function ImageDetailPage({ params }: ImageDetailPageProps) 
             <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
               <li>
                 <Link href={`/${locale}/galleries`} className="hover:text-foreground transition-colors">
-                  {t('title')}
+                  {tNav('galleries')}
                 </Link>
               </li>
               <li>/</li>
