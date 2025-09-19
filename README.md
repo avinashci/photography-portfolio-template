@@ -7,24 +7,24 @@ A modern, production-ready photography portfolio template built with Next.js 15,
 ## ✨ Features
 
 - 🎨 **Modern Design**: Clean, responsive photography portfolio
-- 🌐 **Internationalization**: English and Tamil language support
+- 🌐 **Internationalization**: Multi-language support (English included, easily extendable)
 - 📱 **Mobile Optimized**: Perfect on all devices
 - 🚀 **Performance**: Optimized images, lazy loading, caching
 - 🛡️ **Security**: Enterprise-grade security headers and protection
 - 📊 **CMS**: Full-featured content management with Payload CMS
 - 🔍 **SEO**: Comprehensive SEO optimization
 - 📈 **Analytics Ready**: Google Analytics integration
-- 🐳 **Docker Ready**: Production container configuration
+- 🎨 **Theming**: Customizable with tweakcn.com integration
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript (strict mode)
 - **CMS**: Payload CMS 3.0 with MongoDB
-- **Styling**: Tailwind CSS + CSS Modules
+- **Styling**: Tailwind CSS 4.x with custom properties
 - **Images**: Next.js Image Optimization (AVIF/WebP)
 - **Database**: MongoDB with Mongoose
-- **Deployment**: Docker + Nginx
+- **Deployment**: Vercel, Netlify, or any Node.js host
 - **Monitoring**: Built-in health checks and logging
 
 ## 📋 Prerequisites
@@ -149,11 +149,12 @@ src/
 
 ## 🌐 Internationalization
 
-The app supports multiple languages:
-- English (en) - Default
-- Tamil (ta)
-
-Add translations in `src/lib/i18n/messages/`
+Built-in internationalization system:
+- English (en) - Default language included
+- Easily extendable to additional languages
+- Route-based localization (`/en/`, `/[locale]/`)
+- Add new languages by creating translation files in `src/lib/i18n/messages/`
+- Configure additional locales in environment variables
 
 ## 🛡️ Security Features
 
@@ -177,19 +178,31 @@ Add translations in `src/lib/i18n/messages/`
 - Request/response logging
 - Database operation logging
 
-## 🐳 Docker Deployment
+## 🎨 Theming & Customization
 
-### Development
-```bash
-docker-compose -f docker-compose.dev.yml up
+### Custom Themes
+Create your own color scheme using [tweakcn.com](https://tweakcn.com):
+
+1. **Generate Theme**: Visit [tweakcn.com](https://tweakcn.com) to create your color palette
+2. **Copy CSS Variables**: Copy the generated CSS custom properties
+3. **Update Global Styles**: Paste into `src/app/globals.css`
+4. **Customize Components**: Modify component styles as needed
+
+### Theme System
+- Built with CSS custom properties for easy theming
+- Dark/light mode support with `next-themes`
+- Tailwind CSS 4.x for consistent design system
+- Professional photography-focused color schemes included
+
+### Example Theme Update
+```css
+/* In src/app/globals.css */
+:root {
+  --background: your-custom-value;
+  --foreground: your-custom-value;
+  /* Add your tweakcn.com generated variables */
+}
 ```
-
-### Production
-```bash
-docker-compose up -d
-```
-
-See [docs/02-PRODUCTION-DEPLOYMENT.md](./docs/02-PRODUCTION-DEPLOYMENT.md) for complete deployment guide.
 
 ## 📁 Environment Variables
 
