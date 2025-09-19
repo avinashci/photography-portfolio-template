@@ -135,7 +135,7 @@ export async function generateMetadata({ params }: ImageDetailPageProps): Promis
 export default async function ImageDetailPage({ params }: ImageDetailPageProps) {
   const { locale, slug, imageSlug } = await params
   const t = await getTranslations('galleries')
-  const tNav = await getTranslations('nav')
+  const tNav = await getTranslations('navigation')
   
   // Fetch image, gallery and default copyright from CMS
   const [image, defaultCopyright] = await Promise.all([

@@ -125,6 +125,7 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
   const { locale, slug } = await params
   const t = await getTranslations()
   const tGalleries = await getTranslations('galleries')
+  const tNav = await getTranslations('navigation')
   
   // Fetch gallery from PayloadCMS
   const gallery = await getGalleryBySlug(slug)
@@ -221,7 +222,7 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
                       href={`/${locale}/galleries`}
                       className={`transition-colors ${gallery.coverImage ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
                     >
-                      {locale === 'ta' ? 'கேலரிகள்' : 'Galleries'}
+                      {tNav('galleries')}
                     </Link>
                   </li>
                   <li className={gallery.coverImage ? 'text-white/50' : 'text-muted-foreground'}>/</li>
