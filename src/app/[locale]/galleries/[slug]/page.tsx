@@ -190,88 +190,69 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
       />
       
       <div className="min-h-screen">
-      {/* Immersive Gallery Header */}
-      <section className="relative overflow-hidden">
-        {/* Hero background with cover image if available */}
-        {gallery.coverImage && typeof gallery.coverImage === 'string' && (
-          <div className="absolute inset-0">
-            <img
-              src={gallery.coverImage}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80"></div>
-          </div>
-        )}
-        
-        {!gallery.coverImage && (
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-muted/50"></div>
-        )}
-        
-        <div className="relative py-16 lg:py-20">
-          <div className="px-6 lg:px-12 xl:px-16 max-w-[1400px] mx-auto">
-            {/* Breadcrumb - styled for overlay */}
-            <nav className="mb-12">
-              <ol className="flex items-center space-x-2 text-sm">
-                <li>
-                  <Link 
-                    href={`/${locale}/galleries`} 
-                    className={`transition-colors ${gallery.coverImage ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    {locale === 'ta' ? 'கேலரிகள்' : 'Galleries'}
-                  </Link>
-                </li>
-                <li className={gallery.coverImage ? 'text-white/50' : 'text-muted-foreground'}>/</li>
-                <li className={`font-medium ${gallery.coverImage ? 'text-white' : 'text-foreground'}`}>{title}</li>
-              </ol>
-            </nav>
+      {/* Clean minimal gallery header */}
+      <section className="relative">
+        <div className="py-12 lg:py-16">
+          <div className="container mx-auto px-4">
+            <div className="pl-3">
+              {/* Breadcrumb */}
+              <nav className="mb-8">
+                <ol className="flex items-center space-x-2 text-sm">
+                  <li>
+                    <Link
+                      href={`/${locale}/galleries`}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {locale === 'ta' ? 'கேலரிகள்' : 'Galleries'}
+                    </Link>
+                  </li>
+                  <li className="text-muted-foreground">/</li>
+                  <li className="font-medium text-foreground">{title}</li>
+                </ol>
+              </nav>
 
-            {/* Gallery Title & Description */}
-            <div className="max-w-4xl">
-              <h1 className={`font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-8 tracking-tight ${gallery.coverImage ? 'text-white drop-shadow-2xl' : 'text-foreground'}`}>
-                {title}
-              </h1>
-              
-              <p className={`text-xl md:text-2xl leading-relaxed mb-8 font-light max-w-3xl ${gallery.coverImage ? 'text-white/90 drop-shadow-xl' : 'text-muted-foreground'}`}>
-                {description}
-              </p>
-              
-              {/* Meta info - redesigned */}
-              <div className="flex flex-wrap items-center gap-6 mb-8">
-                <div className={`flex items-center gap-3 ${gallery.coverImage ? 'text-white/80' : 'text-muted-foreground'}`}>
-                  <div className={`w-2 h-2 rounded-full ${gallery.coverImage ? 'bg-white/60' : 'bg-primary/60'}`}></div>
-                  <span className="text-sm font-medium">
-                    {('imageCount' in gallery ? gallery.imageCount : null) || ('images' in gallery ? gallery.images?.length : 0) || 0} {locale === 'ta' ? 'படங்கள்' : 'Images'}
-                  </span>
-                </div>
-                
-                {tags && tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {tags.slice(0, 4).map((tag: string) => (
-                      <span
-                        key={tag}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full ${
-                          gallery.coverImage 
-                            ? 'bg-white/20 text-white/90 backdrop-blur-sm' 
-                            : 'bg-muted/80 text-muted-foreground'
-                        }`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
+              {/* Gallery Title & Description */}
+              <div className="max-w-4xl">
+                <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-tight text-foreground">
+                  {title}
+                </h1>
+
+                <p className="text-base md:text-lg leading-relaxed mb-6 max-w-3xl text-muted-foreground">
+                  {description}
+                </p>
+
+                {/* Meta info */}
+                <div className="flex flex-wrap items-center gap-6 mb-6">
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <div className="w-2 h-2 rounded-full bg-primary/60"></div>
+                    <span className="text-sm font-medium">
+                      {('imageCount' in gallery ? gallery.imageCount : null) || ('images' in gallery ? gallery.images?.length : 0) || 0} {locale === 'ta' ? 'படங்கள்' : 'Images'}
+                    </span>
                   </div>
-                )}
-              </div>
-              
-              {/* Social Sharing - integrated into header */}
-              <div className={`pt-4 ${gallery.coverImage ? '' : 'border-t border-border'}`}>
-                <SocialShare
-                  url={`${SITE_CONFIG.url.base}/${locale}/galleries/${slug}`}
-                  title={title}
-                  description={description || `${title} photography gallery`}
-                  hashtags={['photography', 'gallery', ...(tags?.slice(0, 3) || [])]}
-                  className={gallery.coverImage ? 'text-white' : ''}
-                />
+
+                  {tags && tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {tags.slice(0, 4).map((tag: string) => (
+                        <span
+                          key={tag}
+                          className="px-3 py-1.5 text-xs font-medium rounded-full bg-muted/80 text-muted-foreground"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Social Sharing */}
+                <div className="pt-4 border-t border-border">
+                  <SocialShare
+                    url={`${SITE_CONFIG.url.base}/${locale}/galleries/${slug}`}
+                    title={title}
+                    description={description || `${title} photography gallery`}
+                    hashtags={['photography', 'gallery', ...(tags?.slice(0, 3) || [])]}
+                  />
+                </div>
               </div>
             </div>
           </div>
