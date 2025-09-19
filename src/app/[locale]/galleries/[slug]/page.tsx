@@ -190,62 +190,102 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
       />
       
       <div className="min-h-screen">
-      {/* Clean minimal gallery header */}
-      <section className="relative">
-        <div className="py-12 lg:py-16">
-          <div className="container mx-auto px-4">
-            <div className="pl-3">
+        {/* Immersive Gallery Hero */}
+        <section className="relative overflow-hidden">
+          {/* Cover Image Background */}
+          {gallery.coverImage ? (
+            <div className="absolute inset-0">
+              <img
+                src={typeof gallery.coverImage === 'string'
+                  ? gallery.coverImage
+                  : typeof gallery.coverImage === 'object' && 'imageUrls' in gallery.coverImage
+                    ? gallery.coverImage.imageUrls?.medium || gallery.coverImage.imageUrls?.full || gallery.coverImage.url
+                    : gallery.coverImage
+                }
+                alt={title}
+                className="w-full h-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/60"></div>
+            </div>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-muted/50"></div>
+          )}
+
+          <div className="relative py-16 lg:py-20">
+            <div className="px-6 lg:px-12 xl:px-16 max-w-[1400px] mx-auto">
               {/* Breadcrumb */}
-              <nav className="mb-8">
+              <nav className="mb-12">
                 <ol className="flex items-center space-x-2 text-sm">
                   <li>
                     <Link
                       href={`/${locale}/galleries`}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      className={`transition-colors ${gallery.coverImage ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                       {locale === 'ta' ? 'கேலரிகள்' : 'Galleries'}
                     </Link>
                   </li>
-                  <li className="text-muted-foreground">/</li>
-                  <li className="font-medium text-foreground">{title}</li>
+                  <li className={gallery.coverImage ? 'text-white/50' : 'text-muted-foreground'}>/</li>
+                  <li className={`font-medium ${gallery.coverImage ? 'text-white' : 'text-foreground'}`}>{title}</li>
                 </ol>
               </nav>
 
-              {/* Gallery Title & Description */}
-              <div className="max-w-4xl">
-                <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-tight text-foreground">
-                  {title}
-                </h1>
+              {/* Gallery Header */}
+              <header className="max-w-4xl">
+                <div className="flex flex-wrap items-center gap-4 mb-8">
+                  {tags && tags.length > 0 && (
+                    <span className={`px-4 py-2 text-sm font-medium rounded-full ${
+                      gallery.coverImage
+                        ? 'bg-white/20 text-white/90 backdrop-blur-sm'
+                        : 'bg-primary/10 text-primary'
+                    }`}>
+                      {tags[0]}
+                    </span>
+                  )}
 
-                <p className="text-base md:text-lg leading-relaxed mb-6 max-w-3xl text-muted-foreground">
-                  {description}
-                </p>
-
-                {/* Meta info */}
-                <div className="flex flex-wrap items-center gap-6 mb-6">
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <div className="w-2 h-2 rounded-full bg-primary/60"></div>
-                    <span className="text-sm font-medium">
+                  <div className={`flex items-center gap-3 text-sm ${
+                    gallery.coverImage ? 'text-white/80' : 'text-muted-foreground'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${gallery.coverImage ? 'bg-white/60' : 'bg-primary/60'}`}></div>
+                    <span className="font-medium">
                       {('imageCount' in gallery ? gallery.imageCount : null) || ('images' in gallery ? gallery.images?.length : 0) || 0} {locale === 'ta' ? 'படங்கள்' : 'Images'}
                     </span>
                   </div>
-
-                  {tags && tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {tags.slice(0, 4).map((tag: string) => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1.5 text-xs font-medium rounded-full bg-muted/80 text-muted-foreground"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
+                <h1 className={`font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight tracking-tight ${
+                  gallery.coverImage ? 'text-white drop-shadow-2xl' : 'text-foreground'
+                }`}>
+                  {title}
+                </h1>
+
+                {description && (
+                  <p className={`text-xl md:text-2xl font-light mb-4 max-w-3xl leading-relaxed ${
+                    gallery.coverImage ? 'text-white/90 drop-shadow-xl' : 'text-muted-foreground'
+                  }`}>
+                    {description}
+                  </p>
+                )}
+
+                {/* Tags */}
+                {tags && tags.length > 1 && (
+                  <div className="flex flex-wrap gap-3 mb-8">
+                    {tags.slice(1, 5).map((tag: string) => (
+                      <span
+                        key={tag}
+                        className={`px-3 py-2 text-sm font-medium rounded-full ${
+                          gallery.coverImage
+                            ? 'bg-white/15 text-white/90 backdrop-blur-sm'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {/* Social Sharing */}
-                <div className="pt-4 border-t border-border">
+                <div className={`pt-4 ${gallery.coverImage ? 'border-t border-white/20' : 'border-t border-border'}`}>
                   <SocialShare
                     url={`${SITE_CONFIG.url.base}/${locale}/galleries/${slug}`}
                     title={title}
@@ -253,11 +293,10 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
                     hashtags={['photography', 'gallery', ...(tags?.slice(0, 3) || [])]}
                   />
                 </div>
-              </div>
+              </header>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Gallery Images Section */}
       <section className="relative">
