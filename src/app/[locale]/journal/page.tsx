@@ -114,17 +114,15 @@ function calculateReadTime(content: any): string {
 
   return (
     <div className="min-h-screen">
-      {/* Full-width immersive header */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-muted/30"></div>
-        
-        <div className="relative py-16 lg:py-20">
-          <div className="px-6 lg:px-12 xl:px-16 max-w-[1600px] mx-auto">
-            <div className="text-center mb-20">
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">
+      {/* Clean minimal header */}
+      <section className="relative">
+        <div className="py-12 lg:py-16">
+          <div className="px-6 lg:px-12 xl:px-16">
+            <div className="text-center mb-16">
+              <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 tracking-tight">
                 {t('title')}
               </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-light">
+              <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 {t('description', { name: personalData.name })}
               </p>
             </div>
