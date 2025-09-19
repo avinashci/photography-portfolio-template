@@ -44,11 +44,15 @@ export default function Lightbox({
 }: LightboxProps) {
   const t = useTranslations('lightbox')
   const currentImage = images[currentIndex]
+  const [hasKeyboard, setHasKeyboard] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return
-      
+
+      // Detect keyboard usage
+      setHasKeyboard(true)
+
       switch (e.key) {
         case 'Escape':
           onClose()
@@ -62,7 +66,9 @@ export default function Lightbox({
       }
     }
 
+    // Reset keyboard detection when lightbox opens
     if (isOpen) {
+      setHasKeyboard(false)
       document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
     }
@@ -71,7 +77,7 @@ export default function Lightbox({
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'unset'
     }
-  }, [isOpen, onClose, onNext, onPrev])
+  }, [isOpen, onClose, onNext, onPrev, simpleMode])
 
   if (!isOpen || !currentImage) return null
 
@@ -83,20 +89,20 @@ export default function Lightbox({
           <>
             <button
               onClick={onPrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 p-2 md:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
               aria-label={t('previous')}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
 
             <button
               onClick={onNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 p-2 md:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
               aria-label={t('next')}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -124,13 +130,27 @@ export default function Lightbox({
               const fallbackSrc = imageUrls?.large || imageUrls?.medium || imageUrls?.thumbnail || (currentImage as any).url || ''
 
               return fullSizeSrc ? (
-                <OptimizedImage
-                  src={fullSizeSrc}
-                  fallbackSrc={fallbackSrc}
-                  alt={getLocalizedValue(currentImage.altText, locale) || getLocalizedValue(currentImage.title, locale)}
-                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                  loading="eager"
-                />
+                <div className="relative">
+                  <OptimizedImage
+                    src={fullSizeSrc}
+                    fallbackSrc={fallbackSrc}
+                    alt={getLocalizedValue(currentImage.altText, locale) || getLocalizedValue(currentImage.title, locale)}
+                    className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                    loading="eager"
+                  />
+
+                  {/* Mobile image title overlay - only show on mobile when sidebar is hidden */}
+                  <div className="lg:hidden absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 rounded-b-lg">
+                    <h2 className="text-white font-medium text-sm text-center drop-shadow-lg">
+                      {getLocalizedValue(currentImage.title, locale || 'en') || 'Untitled'}
+                    </h2>
+                    {currentImage.location?.name && (
+                      <p className="text-white/80 text-center text-xs mt-1 drop-shadow-lg">
+                        {getLocalizedValue(currentImage.location?.name, locale || 'en')}
+                      </p>
+                    )}
+                  </div>
+                </div>
               ) : (
                 <div className="bg-muted rounded-lg border border-border aspect-[4/3] w-96 max-w-full flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
@@ -148,20 +168,15 @@ export default function Lightbox({
           </div>
         </div>
 
-        {/* Info sidebar - hidden in simple mode */}
+        {/* Info sidebar - hidden in simple mode and on mobile */}
         {!simpleMode && (
-          <div className="w-80 bg-black/80 backdrop-blur-sm p-6 overflow-y-auto">
+          <div className="hidden lg:block w-80 bg-black/80 backdrop-blur-sm p-6 overflow-y-auto">
           <div className="text-white space-y-6">
-            {/* Image Title and Description */}
+            {/* Image Title */}
             <section>
               <h1 className="font-serif text-2xl font-bold text-white mb-4">
                 {getLocalizedValue(currentImage.title, locale || 'en') || 'Untitled'}
               </h1>
-              {getLocalizedValue(currentImage.description, locale || 'en') && (
-                <p className="text-base text-white/80 leading-relaxed">
-                  {getLocalizedValue(currentImage.description, locale || 'en')}
-                </p>
-              )}
             </section>
 
             {/* Technical Details */}
@@ -215,16 +230,18 @@ export default function Lightbox({
               </>
             )}
             
-            {/* Keyboard shortcuts */}
-            <div className="pt-6 border-t border-white/20">
-              <h4 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-2">
-                Keyboard Shortcuts
-              </h4>
-              <div className="text-xs space-y-1 text-white/60">
-                <p>← → Navigate</p>
-                <p>ESC Close</p>
+            {/* Keyboard shortcuts - only show when keyboard is detected */}
+            {hasKeyboard && (
+              <div className="pt-6 border-t border-white/20">
+                <h4 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-2">
+                  Keyboard Shortcuts
+                </h4>
+                <div className="text-xs space-y-1 text-white/60">
+                  <p>← → Navigate</p>
+                  <p>ESC Close</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           </div>
         )}
