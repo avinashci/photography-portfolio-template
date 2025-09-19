@@ -261,14 +261,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   </div>
                 </div>
                 
-                <h1 className={`font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight tracking-tight ${
+                <h1 className={`font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight tracking-tight ${
                   post.featuredImage ? 'text-white drop-shadow-2xl' : 'text-foreground'
                 }`}>
                   {title}
                 </h1>
                 
                 {subtitle && (
-                  <h2 className={`text-xl md:text-2xl font-light mb-4 max-w-3xl leading-relaxed ${
+                  <h2 className={`text-base md:text-lg font-light mb-4 max-w-3xl leading-relaxed ${
                     post.featuredImage ? 'text-white/90 drop-shadow-xl' : 'text-muted-foreground'
                   }`}>
                     {subtitle}

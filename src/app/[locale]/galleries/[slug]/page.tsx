@@ -252,14 +252,14 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
                   </div>
                 </div>
 
-                <h1 className={`font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight tracking-tight ${
+                <h1 className={`font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight tracking-tight ${
                   gallery.coverImage ? 'text-white drop-shadow-2xl' : 'text-foreground'
                 }`}>
                   {title}
                 </h1>
 
                 {description && (
-                  <p className={`text-xl md:text-2xl font-light mb-4 max-w-3xl leading-relaxed ${
+                  <p className={`text-base md:text-lg font-light mb-4 max-w-3xl leading-relaxed ${
                     gallery.coverImage ? 'text-white/90 drop-shadow-xl' : 'text-muted-foreground'
                   }`}>
                     {description}
